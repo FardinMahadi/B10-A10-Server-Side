@@ -28,6 +28,7 @@ async function run() {
 
     const database = client.db("ChillGamer");
     const usersCollection = database.collection("users");
+    const reviewCollection = database.collection("reviews");
 
     app.get("/users", async (req, res) => {
       const email = req.query.email;
@@ -45,10 +46,26 @@ async function run() {
       }
     });
 
+    app.get("/reviews", async (req, res) => {
+      try {
+        const reviews = await reviewCollection.find({}).toArray();
+        res.status(200).json(reviews);
+      } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+      }
+    });
+
     app.post("/users", async (req, res) => {
       const newUser = req.body;
       console.log(newUser);
       const result = await usersCollection.insertOne(newUser);
+      res.send(result);
+    });
+
+    app.post("/reviews", async (req, res) => {
+      const newReview = req.body;
+      console.log(newReview);
+      const result = await reviewCollection.insertOne(newReview);
       res.send(result);
     });
 
